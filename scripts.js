@@ -141,8 +141,17 @@ navLinks.forEach(link => {
     });
 });
 
-// Form submission and validation
+// Form submission and validation with EmailJS
 const contactForm = document.getElementById('contact-form');
+
+// Initialize EmailJS (you'll need to replace these with your actual values)
+// Get these from your EmailJS dashboard after creating an account
+const EMAILJS_PUBLIC_KEY = 'gsjEM8BrpS8C9Yxws'; // Replace with your public key
+const EMAILJS_SERVICE_ID = 'service_0xatlml'; // Replace with your service ID
+const EMAILJS_TEMPLATE_ID = 'template_0ikzfn4'; // Replace with your template ID
+
+// Initialize EmailJS
+emailjs.init(EMAILJS_PUBLIC_KEY);
 
 contactForm.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -150,9 +159,10 @@ contactForm.addEventListener('submit', (e) => {
     // Basic form validation
     const name = document.getElementById('name').value;
     const email = document.getElementById('email').value;
+    const subject = document.getElementById('subject').value;
     const message = document.getElementById('message').value;
     
-    if (name === '' || email === '' || message === '') {
+    if (name === '' || email === '' || subject === '' || message === '') {
         alert('Please fill in all required fields.');
         return;
     }
@@ -164,24 +174,48 @@ contactForm.addEventListener('submit', (e) => {
         return;
     }
     
-    // If validation passes, show success message
+    // If validation passes, send email via EmailJS
     const submitBtn = document.querySelector('.submit-btn');
     submitBtn.textContent = 'Sending...';
+    submitBtn.disabled = true;
     
-    // Simulate sending (would be replaced with actual AJAX in production)
-    setTimeout(() => {
-        submitBtn.textContent = 'Message Sent!';
-        submitBtn.style.backgroundColor = '#28a745';
-        
-        // Reset form
-        contactForm.reset();
-        
-        // Reset button after delay
-        setTimeout(() => {
+    // Prepare template parameters
+    const templateParams = {
+        from_name: name,
+        from_email: email,
+        subject: subject,
+        message: message,
+        to_email: 'josh@datagainz.com'
+    };
+    
+    // Send email using EmailJS
+    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+        .then((response) => {
+            console.log('Email sent successfully:', response);
+            submitBtn.textContent = 'Message Sent!';
+            submitBtn.style.backgroundColor = '#28a745';
+            
+            // Reset form
+            contactForm.reset();
+            
+            // Show success message
+            alert('Thank you! Your message has been sent successfully.');
+            
+            // Reset button after delay
+            setTimeout(() => {
+                submitBtn.textContent = 'Send Message';
+                submitBtn.style.backgroundColor = '';
+                submitBtn.disabled = false;
+            }, 3000);
+        })
+        .catch((error) => {
+            console.error('Email sending failed:', error);
             submitBtn.textContent = 'Send Message';
-            submitBtn.style.backgroundColor = '';
-        }, 3000);
-    }, 1500);
+            submitBtn.disabled = false;
+            
+            // Show error message
+            alert('Sorry, there was an error sending your message. Please try again or contact me directly at josh@datagainz.com');
+        });
 });
 
 // Reveal animations on scroll
