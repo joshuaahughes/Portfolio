@@ -4,719 +4,263 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trading with Confidence: A Fourier Transform and GARCH Model Strategy</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: "Times New Roman", Times, serif;
             line-height: 1.6;
-            color: #333;
-            background-color: #f8f9fa;
-            padding-top: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-        h1, h2, h3, h4 {
-            color: #2c3e50;
-            margin-top: 1.5em;
-            margin-bottom: 0.8em;
-            font-weight: 600;
-        }
-        h1 {
-            font-size: 2.5rem;
-            text-align: center;
-            margin-bottom: 1.5em;
-            color: #1a5276;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 15px;
-        }
-        h2 {
-            font-size: 2rem;
-            border-bottom: 1px solid #eaecef;
-            padding-bottom: 10px;
-            color: #2874a6;
-        }
-        h3 {
-            font-size: 1.5rem;
-            color: #2e86c1;
-        }
-        h4 {
-            font-size: 1.25rem;
-            color: #3498db;
-        }
-        p {
-            margin-bottom: 1.2em;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
             text-align: justify;
         }
-        code {
-            background-color: #f7f7f7;
-            padding: 2px 4px;
-            border-radius: 4px;
-            color: #e74c3c;
+        h1, h2, h3 {
+            text-align: center;
+            color: #222;
         }
-        pre {
-            background-color: #f8f9fa;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 20px;
-            overflow-x: auto;
+        h1 {
+            font-size: 24px;
         }
-        .code-block {
-            background-color: #f8f9fa;
-            border-left: 4px solid #3498db;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 20px;
-            overflow-x: auto;
+        h2 {
+            font-size: 20px;
         }
-        table {
-            width: 100%;
-            margin-bottom: 20px;
-            border-collapse: collapse;
+        h3 {
+            font-size: 16px;
         }
-        th, td {
-            padding: 12px 15px;
-            border: 1px solid #ddd;
+        p {
+            margin-bottom: 1em;
         }
-        th {
-            background-color: #f2f2f2;
-            font-weight: 600;
+        .container {
+            margin-top: 2em;
         }
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        .image-container {
+            text-align: center;
+            margin: 2em 0;
         }
-        .abstract {
+        img {
+            max-width: 80%;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+        }
+        .caption {
+            text-align: center;
             font-style: italic;
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-left: 4px solid #3498db;
-            margin-bottom: 30px;
+            margin-top: 0.5em;
         }
-        .nav-pills .nav-link.active {
-            background-color: #3498db;
+        .references {
+            margin-top: 2em;
         }
-        .nav-pills .nav-link {
-            color: #2874a6;
+        .references h2 {
+            text-align: left;
         }
-        .tab-content {
-            padding: 20px;
-            border: 1px solid #dee2e6;
-            border-top: none;
-            border-radius: 0 0 5px 5px;
+        .references ul {
+            list-style-type: none;
+            padding: 0;
         }
-        .formula {
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-            text-align: center;
-        }
-        .highlight {
-            background-color: #f1f9ff;
-            padding: 20px;
-            border-radius: 5px;
-            margin: 20px 0;
-            border-left: 4px solid #3498db;
-        }
-        .figure {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .figure img {
-            max-width: 100%;
-            border-radius: 5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .figure-caption {
-            font-style: italic;
-            color: #666;
-            margin-top: 10px;
-        }
-        .header-logo {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .header-logo img {
-            max-width: 150px;
-        }
-        .section-nav {
-            position: sticky;
-            top: 20px;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 50px;
-            padding: 20px;
-            background-color: #2c3e50;
-            color: white;
-            border-radius: 5px;
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 15px;
-            }
-            h1 {
-                font-size: 2rem;
-            }
-            h2 {
-                font-size: 1.75rem;
-            }
-            h3 {
-                font-size: 1.5rem;
-            }
+        .references li {
+            margin-bottom: 0.5em;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header-logo">
-            <img src="assets/Original.png" alt="QuantConnect Logo">
-        </div>
-        
         <h1>Trading with Confidence: A Fourier Transform and GARCH Model Strategy</h1>
         
-        <div class="row">
-            <div class="col-md-3 d-none d-md-block">
-                <div class="section-nav">
-                    <nav id="navbar-example3" class="h-100 flex-column align-items-stretch pe-4 border-end">
-                        <nav class="nav nav-pills flex-column">
-                            <a class="nav-link" href="#abstract">Abstract</a>
-                            <a class="nav-link" href="#introduction">Introduction</a>
-                            <a class="nav-link" href="#mathematical-foundation">Mathematical Foundation</a>
-                            <nav class="nav nav-pills flex-column">
-                                <a class="nav-link ms-3 my-1" href="#fourier-transform">Fourier Transform</a>
-                                <a class="nav-link ms-3 my-1" href="#garch-modeling">GARCH Modeling</a>
-                                <a class="nav-link ms-3 my-1" href="#confidence-scoring">Confidence Scoring</a>
-                            </nav>
-                            <a class="nav-link" href="#implementation">Implementation Details</a>
-                            <nav class="nav nav-pills flex-column">
-                                <a class="nav-link ms-3 my-1" href="#quantconnect-integration">QuantConnect Integration</a>
-                                <a class="nav-link ms-3 my-1" href="#custom-indicators">Custom Indicators</a>
-                                <a class="nav-link ms-3 my-1" href="#risk-management">Risk Management</a>
-                            </nav>
-                            <a class="nav-link" href="#backtesting">Backtesting Results</a>
-                            <a class="nav-link" href="#conclusion">Conclusion</a>
-                        </nav>
-                    </nav>
-                </div>
-            </div>
-            
-            <div class="col-md-9">
-                <section id="abstract">
-                    <div class="abstract">
-                        <p>This white paper presents a sophisticated algorithmic trading strategy that combines Fourier Transform analysis and Generalized Autoregressive Conditional Heteroskedasticity (GARCH) modeling with a confidence scoring system. The strategy operates on a one-minute timeframe and employs a unique approach to trade filtering: it only executes trades when the confidence score exceeds a predefined threshold. By integrating spectral analysis techniques with volatility forecasting models, the strategy aims to identify high-probability trading opportunities while effectively managing risk.</p>
-                        
-                        <p>The Fast Fourier Transform (FFT) component analyzes price data to detect cyclical patterns and dominant frequencies, enabling the prediction of future price movements based on historical cycles. The GARCH model component forecasts volatility, providing crucial information for risk assessment and position sizing. The confidence scoring system combines signals from both models to generate a comprehensive measure of trade quality, ensuring that only the most promising opportunities are acted upon.</p>
-                        
-                        <p>This paper details the mathematical foundations of the strategy, its implementation in QuantConnect's Python framework, and the results of backtesting. The strategy demonstrates how advanced mathematical techniques can be applied to financial markets to create a disciplined, systematic approach to trading.</p>
-                    </div>
-                </section>
-                
-                <section id="introduction">
-                    <h2>Introduction</h2>
-                    
-                    <p>The financial markets are complex adaptive systems characterized by non-linear dynamics, regime changes, and varying degrees of efficiency. Traditional technical analysis often falls short in capturing the intricate patterns and relationships that drive price movements. This limitation has led to the development of more sophisticated quantitative approaches that leverage advanced mathematical and statistical techniques.</p>
-                    
-                    <p>Our strategy addresses these challenges by combining two powerful mathematical tools: Fourier Transform analysis and GARCH modeling. The Fourier Transform decomposes price data into its constituent frequency components, revealing cyclical patterns that may not be apparent in the time domain. GARCH models, on the other hand, capture the time-varying nature of volatility, accounting for volatility clustering and persistence that are common in financial time series.</p>
-                    
-                    <div class="highlight">
-                        <p>What sets our approach apart is the integration of these techniques within a confidence scoring framework. Rather than executing trades based solely on directional signals or volatility forecasts, our strategy calculates a comprehensive confidence score that considers multiple factors:</p>
-                        
-                        <ol>
-                            <li>The strength and clarity of cyclical patterns identified by the Fourier Transform</li>
-                            <li>The stability and predictability of volatility as assessed by the GARCH model</li>
-                            <li>The consistency of signals across different timeframes and indicators</li>
-                        </ol>
-                        
-                        <p>By establishing a minimum threshold for the confidence score, the strategy filters out low-quality trading opportunities, focusing only on situations where multiple factors align favorably. This approach aims to improve the risk-adjusted return profile by reducing the frequency of trades while increasing their average profitability.</p>
-                    </div>
-                    
-                    <h3>Strategy Overview</h3>
-                    
-                    <p>The strategy operates on a one-minute timeframe, making it suitable for intraday trading of liquid instruments such as major equity indices, forex pairs, and futures contracts. It follows a systematic process:</p>
-                    
-                    <ol>
-                        <li><strong>Data Collection</strong>: Gather one-minute OHLCV (Open, High, Low, Close, Volume) data for the target security.</li>
-                        <li><strong>Fourier Analysis</strong>: Apply Fast Fourier Transform to recent price data to identify dominant frequencies and project future price movements.</li>
-                        <li><strong>Volatility Modeling</strong>: Fit a GARCH model to recent returns data to forecast volatility and assess risk.</li>
-                        <li><strong>Confidence Scoring</strong>: Combine signals from both models to calculate a confidence score ranging from 0 to 100.</li>
-                        <li><strong>Trade Execution</strong>: Enter positions only when the confidence score exceeds the threshold (e.g., 70), with position size scaled according to the confidence level.</li>
-                        <li><strong>Risk Management</strong>: Implement volatility-based stop-loss and take-profit levels, adjusting them dynamically as market conditions change.</li>
-                    </ol>
-                </section>
-                
-                <section id="mathematical-foundation">
-                    <h2>Mathematical Foundation</h2>
-                    
-                    <section id="fourier-transform">
-                        <h3>Fourier Transform Analysis</h3>
-                        
-                        <h4>Theoretical Background</h4>
-                        
-                        <p>The Fourier Transform is a mathematical technique that decomposes a function of time into its constituent frequencies. Named after the French mathematician Jean-Baptiste Joseph Fourier, this transformation provides a way to analyze signals in the frequency domain rather than the time domain. In the context of financial markets, the Fourier Transform allows us to identify cyclical patterns and periodic components that may not be immediately apparent when looking at price charts.</p>
-                        
-                        <div class="formula">
-                            <p>The Discrete Fourier Transform (DFT) is defined as:</p>
-                            
-                            \[X[k] = \sum_{n=0}^{N-1} x[n] \cdot e^{-i2\pi kn/N}\]
-                            
-                            <p>Where:</p>
-                            <ul>
-                                <li>\(x[n]\) is the input sequence (price data in our case)</li>
-                                <li>\(X[k]\) is the output sequence (frequency components)</li>
-                                <li>\(N\) is the number of samples</li>
-                                <li>\(k\) ranges from 0 to \(N-1\)</li>
-                            </ul>
-                        </div>
-                        
-                        <p>For computational efficiency, we use the Fast Fourier Transform (FFT), an algorithm that computes the DFT in \(O(N \log N)\) time instead of \(O(N^2)\).</p>
-                        
-                        <h4>Application to Financial Time Series</h4>
-                        
-                        <p>When applied to price data, the Fourier Transform reveals the dominant frequencies (cycles) present in the market. These cycles can range from short-term intraday patterns to longer-term seasonal effects. By identifying these cycles, we can potentially forecast future price movements based on the continuation of these patterns.</p>
-                        
-                        <p>Our implementation follows these steps:</p>
-                        
-                        <ol>
-                            <li><strong>Detrending</strong>: Remove the linear trend from the price series to focus on oscillations around the trend.</li>
-                            <li><strong>FFT Application</strong>: Apply the Fast Fourier Transform to the detrended price series to obtain the frequency spectrum.</li>
-                            <li><strong>Dominant Frequency Identification</strong>: Identify the dominant frequencies by selecting the components with the highest magnitudes.</li>
-                            <li><strong>Signal Reconstruction</strong>: Reconstruct the signal using only the dominant frequencies, filtering out noise.</li>
-                            <li><strong>Forecasting</strong>: Project the reconstructed signal forward to predict future price movements.</li>
-                        </ol>
-                    </section>
-                    
-                    <section id="garch-modeling">
-                        <h3>GARCH Volatility Modeling</h3>
-                        
-                        <h4>Theoretical Background</h4>
-                        
-                        <p>The Generalized Autoregressive Conditional Heteroskedasticity (GARCH) model, introduced by Bollerslev in 1986, is an extension of the ARCH model developed by Engle. GARCH models are particularly well-suited for financial time series because they capture two key characteristics of market volatility:</p>
-                        
-                        <ol>
-                            <li><strong>Volatility Clustering</strong>: Periods of high volatility tend to be followed by high volatility, and periods of low volatility tend to be followed by low volatility.</li>
-                            <li><strong>Mean Reversion</strong>: Volatility tends to revert to a long-run average level over time.</li>
-                        </ol>
-                        
-                        <div class="formula">
-                            <p>The GARCH(p,q) model is defined as:</p>
-                            
-                            \[\sigma_t^2 = \omega + \sum_{i=1}^{p} \alpha_i \epsilon_{t-i}^2 + \sum_{j=1}^{q} \beta_j \sigma_{t-j}^2\]
-                            
-                            <p>Where:</p>
-                            <ul>
-                                <li>\(\sigma_t^2\) is the conditional variance at time \(t\)</li>
-                                <li>\(\epsilon_t\) is the return innovation at time \(t\)</li>
-                                <li>\(\omega\), \(\alpha_i\), and \(\beta_j\) are parameters to be estimated</li>
-                                <li>\(p\) is the order of the GARCH terms</li>
-                                <li>\(q\) is the order of the ARCH terms</li>
-                            </ul>
-                        </div>
-                        
-                        <p>In our strategy, we use a GARCH(1,1) model, which is often sufficient to capture the volatility dynamics of financial returns:</p>
-                        
-                        <div class="formula">
-                            \[\sigma_t^2 = \omega + \alpha_1 \epsilon_{t-1}^2 + \beta_1 \sigma_{t-1}^2\]
-                        </div>
-                        
-                        <h4>Application to Financial Time Series</h4>
-                        
-                        <p>The GARCH model provides several valuable insights for our trading strategy:</p>
-                        
-                        <ol>
-                            <li><strong>Volatility Forecasting</strong>: By estimating the parameters of the GARCH model, we can generate forecasts of future volatility, which is crucial for risk assessment and position sizing.</li>
-                            <li><strong>Risk Assessment</strong>: Higher forecasted volatility indicates greater uncertainty and risk, which may warrant smaller position sizes or wider stop-loss levels.</li>
-                            <li><strong>Regime Identification</strong>: Sudden changes in volatility patterns can signal regime shifts in the market, potentially requiring adjustments to the trading strategy.</li>
-                        </ol>
-                    </section>
-                    
-                    <section id="confidence-scoring">
-                        <h3>Confidence Scoring System</h3>
-                        
-                        <h4>Methodology</h4>
-                        
-                        <p>The confidence scoring system is the cornerstone of our strategy, integrating signals from both the Fourier Transform analysis and the GARCH volatility model to generate a comprehensive measure of trade quality. The system assigns a score between 0 and 100 to each potential trading opportunity, with higher scores indicating greater confidence in the trade's success.</p>
-                        
-                        <div class="formula">
-                            <p>The confidence score is calculated as a weighted combination of several factors:</p>
-                            
-                            \[\text{Confidence Score} = w_{\text{FFT}} \cdot \text{FFT Confidence} + w_{\text{GARCH}} \cdot \text{Volatility Confidence}\]
-                            
-                            <p>Where:</p>
-                            <ul>
-                                <li>\(w_{\text{FFT}}\) is the weight assigned to the FFT signal (typically 0.6)</li>
-                                <li>\(w_{\text{GARCH}}\) is the weight assigned to the volatility assessment (typically 0.4)</li>
-                                <li>\(\text{FFT Confidence}\) is derived from the strength and clarity of the Fourier signal</li>
-                                <li>\(\text{Volatility Confidence}\) is derived from the stability and predictability of volatility</li>
-                            </ul>
-                        </div>
-                        
-                        <h4>Trade Execution Threshold</h4>
-                        
-                        <p>The strategy only executes trades when the confidence score exceeds a predefined threshold (typically 70). This filtering mechanism ensures that the strategy only takes positions when multiple factors align favorably, potentially improving the risk-adjusted return profile.</p>
-                        
-                        <div class="formula">
-                            <p>Furthermore, the position size is scaled based on the confidence score above the threshold:</p>
-                            
-                            \[\text{Position Size} = \text{Base Size} \cdot (0.5 + 0.5 \cdot \frac{\text{Confidence} - \text{Threshold}}{100 - \text{Threshold}})\]
-                        </div>
-                        
-                        <p>This approach allocates more capital to higher-conviction trades while maintaining a minimum position size for all trades that meet the threshold criteria.</p>
-                    </section>
-                </section>
-                
-                <section id="implementation">
-                    <h2>Implementation Details</h2>
-                    
-                    <section id="quantconnect-integration">
-                        <h3>QuantConnect Framework Integration</h3>
-                        
-                        <p>QuantConnect is a cloud-based algorithmic trading platform that provides researchers and traders with the tools to design, test, and deploy trading strategies. The platform offers several key advantages for implementing our Fourier Transform and GARCH model strategy:</p>
-                        
-                        <ul>
-                            <li><strong>Data Access</strong>: QuantConnect provides high-quality minute-level data for a wide range of asset classes, including equities, forex, futures, and cryptocurrencies.</li>
-                            <li><strong>Python Integration</strong>: The platform supports Python, allowing us to leverage powerful scientific computing libraries such as NumPy, SciPy, and the ARCH package for GARCH modeling.</li>
-                            <li><strong>Backtesting Engine</strong>: QuantConnect's backtesting engine simulates trading with realistic assumptions about slippage, commission, and market impact.</li>
-                            <li><strong>Live Trading Capabilities</strong>: Strategies can be seamlessly transitioned from backtesting to live trading with minimal code changes.</li>
-                        </ul>
-                        
-                        <p>Our implementation follows QuantConnect's algorithm lifecycle, which consists of the following key methods:</p>
-                        
-                        <ul>
-                            <li><code>Initialize()</code>: Sets up the algorithm, including data subscriptions, parameters, and initial state.</li>
-                            <li><code>OnData()</code>: Processes incoming data and makes trading decisions.</li>
-                            <li><code>OnOrderEvent()</code>: Handles order execution events.</li>
-                            <li><code>OnEndOfAlgorithm()</code>: Performs final calculations and cleanup when the algorithm completes.</li>
-                        </ul>
-                    </section>
-                    
-                    <section id="custom-indicators">
-                        <h3>Custom Indicators</h3>
-                        
-                        <p>To implement our strategy, we created several custom indicators that extend QuantConnect's indicator framework:</p>
-                        
-                        <h4>FFT Indicator</h4>
-                        
-                        <div class="code-block">
-                            <pre><code class="language-python">class FourierTransformIndicator:
-    def __init__(self, window_size=1024, num_components=10, forecast_periods=5):
-        self.window_size = window_size
-        self.num_components = num_components
-        self.forecast_periods = forecast_periods
-        self.price_history = []
-        self.last_forecast = None
-        self.forecast_direction = 0
-        self.forecast_magnitude = 0
-        self.signal_strength = 0
-        
-    def update(self, price):
-        # Add the new price to our history
-        self.price_history.append(price)
-        
-        # Keep only the most recent window_size prices
-        if len(self.price_history) > self.window_size:
-            self.price_history = self.price_history[-self.window_size:]
-        
-        # Only perform FFT analysis if we have enough data
-        if len(self.price_history) < self.window_size:
-            return {
-                'forecast_direction': 0,
-                'forecast_magnitude': 0,
-                'signal_strength': 0,
-                'forecast_values': None
-            }
-        
-        # Perform FFT analysis
-        return self._perform_fft_analysis()</code></pre>
-                        </div>
-                        
-                        <h4>GARCH Indicator</h4>
-                        
-                        <div class="code-block">
-                            <pre><code class="language-python">class GARCHModelIndicator:
-    def __init__(self, window_size=2000, p=1, q=1, forecast_horizon=5):
-        self.window_size = window_size
-        self.p = p
-        self.q = q
-        self.forecast_horizon = forecast_horizon
-        self.returns_history = []
-        self.volatility_forecast = None
-        self.model = None
-        self.model_fit = None
-        self.last_update_size = 0
-        self.volatility_trend = 0
-        self.volatility_level = 0
-        
-    def update(self, price):
-        # Calculate return if we have at least one previous price
-        if len(self.returns_history) > 0:
-            log_return = np.log(price / self.returns_history[-1])
-            self.returns_history.append(price)
-        else:
-            # First price point, no return yet
-            self.returns_history.append(price)
-            log_return = 0
-        
-        # Keep only the most recent window_size returns
-        if len(self.returns_history) > self.window_size:
-            self.returns_history = self.returns_history[-self.window_size:]
-        
-        # Only perform GARCH analysis if we have enough data
-        if len(self.returns_history) < 100:
-            return {
-                'volatility_forecast': None,
-                'volatility_trend': 0,
-                'volatility_level': 0,
-                'risk_score': 0,
-                'volatility_confidence': 50
-            }
-        
-        # Only refit the model every 20 new data points to save computation
-        if len(self.returns_history) - self.last_update_size >= 20 or self.model_fit is None:
-            self.last_update_size = len(self.returns_history)
-            return self._perform_garch_analysis()
-        else:
-            # Return the last forecast if we're not refitting
-            return {
-                'volatility_forecast': self.volatility_forecast,
-                'volatility_trend': self.volatility_trend,
-                'volatility_level': self.volatility_level,
-                'risk_score': self._calculate_risk_score(),
-                'volatility_confidence': self.get_volatility_confidence()
-            }</code></pre>
-                        </div>
-                        
-                        <h4>Confidence Scorer</h4>
-                        
-                        <div class="code-block">
-                            <pre><code class="language-python">class ConfidenceScorer:
-    def __init__(self, fft_weight=0.6, garch_weight=0.4, threshold=70):
-        self.fft_weight = fft_weight
-        self.garch_weight = garch_weight
-        self.threshold = threshold
-        self.confidence_score = 0
-        self.trade_signal = 0
-        
-    def calculate_confidence(self, fft_indicator, garch_indicator):
-        # Get confidence components from each indicator
-        fft_confidence = fft_indicator.get_signal_confidence()
-        volatility_confidence = garch_indicator.get_volatility_confidence()
-        
-        # Calculate weighted confidence score
-        self.confidence_score = (
-            self.fft_weight * fft_confidence + 
-            self.garch_weight * volatility_confidence
-        )
-        
-        # Determine trade signal based on confidence and FFT direction
-        if self.confidence_score >= self.threshold:
-            self.trade_signal = fft_indicator.forecast_direction
-        else:
-            self.trade_signal = 0
-        
-        return {
-            'confidence_score': self.confidence_score,
-            'trade_signal': self.trade_signal,
-            'fft_confidence': fft_confidence,
-            'volatility_confidence': volatility_confidence,
-            'threshold_met': self.confidence_score >= self.threshold
-        }</code></pre>
-                        </div>
-                    </section>
-                    
-                    <section id="risk-management">
-                        <h3>Risk Management</h3>
-                        
-                        <h4>Position Sizing</h4>
-                        
-                        <p>Position sizing is a critical aspect of our strategy, directly linked to the confidence scoring system. The base position size is set as a fraction of the portfolio (typically 1%), which is then scaled based on the confidence score:</p>
-                        
-                        <div class="code-block">
-                            <pre><code class="language-python">def enter_position(self, direction, price, timestamp):
-    # Calculate position size based on confidence
-    if self.last_confidence_score < self.confidence_threshold:
-        self.position_size = 0.0
-    else:
-        # Scale position size linearly from threshold to 100
-        confidence_above_threshold = self.last_confidence_score - self.confidence_threshold
-        max_confidence_range = 100 - self.confidence_threshold
-        
-        # Scale from 50% to 100% of base size based on confidence
-        position_scale = 0.5 + 0.5 * (confidence_above_threshold / max_confidence_range)
-        self.position_size = self.position_sizing_factor * position_scale
-    
-    # Set position state and execute the trade
-    self.current_position = direction
-    self.entry_price = price
-    self.SetHoldings(self.symbol, self.position_size * direction)</code></pre>
-                        </div>
-                        
-                        <h4>Stop Loss and Take Profit</h4>
-                        
-                        <p>The strategy implements dynamic stop loss and take profit levels based on volatility forecasts from the GARCH model:</p>
-                        
-                        <div class="code-block">
-                            <pre><code class="language-python">def update_stop_and_target(self, price, volatility):
-    volatility_price_impact = price * volatility
-    
-    if self.current_position > 0:  # Long position
-        self.stop_loss_price = max(
-            self.stop_loss_price if self.stop_loss_price > 0 else 0,
-            price - (self.stop_loss_multiplier * volatility_price_impact)
-        )
-        self.take_profit_price = price + (self.take_profit_multiplier * volatility_price_impact)
-    else:  # Short position
-        self.stop_loss_price = min(
-            self.stop_loss_price if self.stop_loss_price > 0 else float('inf'),
-            price + (self.stop_loss_multiplier * volatility_price_impact)
-        )
-        self.take_profit_price = price - (self.take_profit_multiplier * volatility_price_impact)</code></pre>
-                        </div>
-                    </section>
-                </section>
-                
-                <section id="backtesting">
-                    <h2>Backtesting Results</h2>
-                    
-                    <h3>Testing Environment</h3>
-                    
-                    <p>The strategy was tested in a simulated environment using historical data to evaluate its performance under realistic market conditions. The backtesting was conducted using QuantConnect's backtesting engine, which provides a comprehensive framework for strategy evaluation.</p>
-                    
-                    <h4>Data and Time Period</h4>
-                    
-                    <p>For our backtesting, we used SPY (SPDR S&P 500 ETF Trust) as the target security, which offers high liquidity and represents the broad U.S. equity market. The test period covered the calendar year 2023, providing a diverse range of market conditions including both trending and range-bound periods.</p>
-                    
-                    <h4>Parameter Settings</h4>
-                    
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Parameter</th>
-                                <th>Value</th>
-                                <th>Description</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>FFT Window Size</td>
-                                <td>1024</td>
-                                <td>Number of data points for FFT analysis</td>
-                            </tr>
-                            <tr>
-                                <td>FFT Components</td>
-                                <td>10</td>
-                                <td>Number of dominant frequencies to use</td>
-                            </tr>
-                            <tr>
-                                <td>GARCH Window Size</td>
-                                <td>2000</td>
-                                <td>Number of data points for GARCH model</td>
-                            </tr>
-                            <tr>
-                                <td>Confidence Threshold</td>
-                                <td>70</td>
-                                <td>Minimum confidence score for trade execution</td>
-                            </tr>
-                            <tr>
-                                <td>FFT Weight</td>
-                                <td>0.6</td>
-                                <td>Weight of FFT signal in confidence calculation</td>
-                            </tr>
-                            <tr>
-                                <td>GARCH Weight</td>
-                                <td>0.4</td>
-                                <td>Weight of volatility assessment in confidence calculation</td>
-                            </tr>
-                            <tr>
-                                <td>Stop Loss Multiplier</td>
-                                <td>2.0</td>
-                                <td>Multiplier for volatility-based stop loss</td>
-                            </tr>
-                            <tr>
-                                <td>Take Profit Multiplier</td>
-                                <td>3.0</td>
-                                <td>Multiplier for volatility-based take profit</td>
-                            </tr>
-                            <tr>
-                                <td>Position Sizing Factor</td>
-                                <td>0.01</td>
-                                <td>Base position size as fraction of portfolio</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    
-                    <h3>Expected Performance Characteristics</h3>
-                    
-                    <div class="highlight">
-                        <p>Based on the strategy design and the mathematical principles underlying its components, we can anticipate certain performance characteristics:</p>
-                        
-                        <ol>
-                            <li><strong>Selective Trading</strong>: Due to the confidence threshold, the strategy is expected to be relatively selective, executing fewer trades compared to strategies without such filtering mechanisms. This selectivity should lead to higher average profitability per trade.</li>
-                            <li><strong>Adaptive Risk Management</strong>: The volatility-based stop loss and take profit levels should adapt to changing market conditions, potentially reducing drawdowns during volatile periods.</li>
-                            <li><strong>Regime Awareness</strong>: The combination of Fourier analysis and GARCH modeling should make the strategy more aware of different market regimes, potentially allowing it to perform well in both trending and range-bound markets.</li>
-                            <li><strong>Balanced Risk-Reward</strong>: The stop loss and take profit multipliers (2.0 and 3.0, respectively) create a favorable risk-reward ratio of 1:1.5, which should contribute to positive expectancy even with a win rate below 50%.</li>
-                        </ol>
-                    </div>
-                    
-                    <h3>Limitations and Future Improvements</h3>
-                    
-                    <h4>Known Limitations</h4>
-                    
-                    <ul>
-                        <li><strong>Computational Intensity</strong>: The FFT and GARCH calculations are computationally intensive, which may limit the strategy's ability to process a large universe of securities simultaneously.</li>
-                        <li><strong>Data Requirements</strong>: The strategy requires a substantial amount of historical data (at least 2000 data points) for proper initialization, which may not always be available for newer securities or during market disruptions.</li>
-                        <li><strong>Parameter Sensitivity</strong>: The performance may be sensitive to parameter choices, requiring careful optimization and ongoing monitoring.</li>
-                    </ul>
-                    
-                    <h4>Potential Improvements</h4>
-                    
-                    <ul>
-                        <li><strong>Multi-Timeframe Analysis</strong>: Incorporating analysis across multiple timeframes could provide a more comprehensive view of market cycles and improve signal quality.</li>
-                        <li><strong>Adaptive Parameters</strong>: Implementing adaptive parameters that adjust based on market conditions could enhance the strategy's robustness across different regimes.</li>
-                        <li><strong>Machine Learning Integration</strong>: Using machine learning techniques to optimize the confidence scoring system or predict parameter values could potentially improve performance.</li>
-                    </ul>
-                </section>
-                
-                <section id="conclusion">
-                    <h2>Conclusion</h2>
-                    
-                    <p>This white paper has presented a sophisticated algorithmic trading strategy that combines Fourier Transform analysis and GARCH volatility modeling with a confidence scoring system. The strategy operates on a one-minute timeframe and employs a unique approach to trade filtering, executing trades only when the confidence score exceeds a predefined threshold.</p>
-                    
-                    <p>The key components of the strategy include:</p>
-                    
-                    <ol>
-                        <li><strong>Fourier Transform Analysis</strong>: Using spectral analysis techniques to identify cyclical patterns in price data and forecast future price movements.</li>
-                        <li><strong>GARCH Volatility Modeling</strong>: Employing time-series models to forecast volatility and assess market risk conditions.</li>
-                        <li><strong>Confidence Scoring System</strong>: Integrating signals from both models to generate a comprehensive measure of trade quality.</li>
-                        <li><strong>Risk Management Framework</strong>: Implementing volatility-based stop loss and take profit levels, along with position sizing scaled by confidence.</li>
-                    </ol>
-                    
-                    <p>The strategy was implemented in QuantConnect's Python framework, leveraging the platform's data access, backtesting capabilities, and live trading infrastructure. Custom indicators were developed for each component, and the main algorithm class integrated these components into a cohesive trading system.</p>
-                    
-                    <div class="highlight">
-                        <p>The key innovation of this strategy lies not in the individual components, which have been studied extensively in the financial literature, but in their integration through the confidence scoring system. This approach moves beyond simple binary signals to a more nuanced evaluation of trading opportunities, considering multiple factors and their interactions.</p>
-                        
-                        <p>As financial markets continue to evolve, strategies that can adapt to changing conditions while maintaining disciplined risk management will become increasingly valuable. The framework presented in this paper provides a template for such adaptive strategies, combining rigorous mathematical analysis with practical trading considerations.</p>
-                    </div>
-                    
-                    <p>In the pursuit of algorithmic trading excellence, it is not enough to identify patterns or forecast volatility in isolation. The true challenge lies in integrating these insights into a coherent trading approach that balances opportunity and risk. The Fourier Transform and GARCH model strategy with confidence scoring represents one solution to this challenge, offering a systematic framework for navigating the complexities of financial markets.</p>
-                </section>
-            </div>
+        <div class="abstract">
+            <h2>Abstract</h2>
+            <p>This paper introduces a trading algorithm that uses a mix of Fourier Transform analysis and GARCH modeling, combined with a confidence scoring system. The strategy works with one-minute data and has a special filter: it only makes a trade if its confidence score is above a certain level. By combining these different analysis methods, the strategy tries to find good trading opportunities and manage risk at the same time.</p>
+            <p>The Fast Fourier Transform (FFT) part of the strategy looks for repeating patterns in price data to help predict where prices might go next. The GARCH model predicts how much the price is likely to swing (volatility), which is important for figuring out risk and how big a trade should be. The confidence score brings together the signals from both models to judge the quality of a trade, making sure only the best ones are taken.</p>
+            <p>This paper explains the math behind the strategy, how it was built using QuantConnect, and how it performed in tests. It shows how some advanced math can be used to create a structured way to trade.</p>
         </div>
+        
+        <h2>Introduction</h2>
+        <p>Financial markets are complicated. They don't always follow predictable patterns, and old-school technical analysis can miss what's really driving price changes. Because of this, traders have developed more advanced methods using math and statistics.</p>
+        <p>Our strategy tackles this by using two main tools: Fourier Transform analysis and GARCH modeling. The Fourier Transform breaks down price data to find hidden cycles. GARCH models, on the other hand, are good at understanding how volatility changes over time, since we know that periods of high volatility are often followed by more high volatility.</p>
+        <p>What makes our approach different is how it combines these tools into a single 'confidence score'. Instead of just trading on a simple signal, the strategy calculates a score based on a few things:</p>
+        <ol>
+            <li>The strength and clarity of cyclical patterns found by the Fourier Transform.</li>
+            <li>The stability and predictability of volatility as measured by the GARCH model.</li>
+            <li>The consistency of signals across different timeframes and indicators.</li>
+        </ol>
+        <p>By setting a minimum for this score, the strategy avoids weaker trade setups and only focuses on the ones where everything lines up. The goal is to trade less often, but to make each trade count more, hopefully leading to better returns for the risk taken.</p>
+        
+        <h3>Strategy Overview</h3>
+        <p>The strategy uses one-minute data, which is good for day trading things like major stock indexes, currencies, or futures. It follows a clear process:</p>
+        <ol>
+            <li><strong>Data Collection</strong>: Gather one-minute OHLCV (Open, High, Low, Close, Volume) data for the security.</li>
+            <li><strong>Fourier Analysis</strong>: Use a Fast Fourier Transform on recent price data to find major cycles and project future price movements.</li>
+            <li><strong>Volatility Modeling</strong>: Fit a GARCH model to recent returns to forecast volatility and assess risk.</li>
+            <li><strong>Confidence Scoring</strong>: Combine signals from both models to get a confidence score from 0 to 100.</li>
+            <li><strong>Trade Execution</strong>: Enter a trade only when the confidence score is above a set threshold (like 70), with the trade size based on the confidence level.</li>
+            <li><strong>Risk Management</strong>: Use stop-loss and take-profit levels based on volatility, and adjust them as the market changes.</li>
+        </ol>
+        
+        <h2>Mathematical Foundation</h2>
+        <h3>Fourier Transform Analysis</h3>
+        <h4>Theoretical Background</h4>
+        <p>The Fourier Transform is a math tool that breaks down a signal, like a price chart, into the different cycles that make it up. It lets us look at the market in terms of cycles instead of just time. This can help us spot repeating patterns that are hard to see just by looking at a chart.</p>
+        <div class="equation">
+            <p>The Discrete Fourier Transform (DFT) is defined as:</p>
+            $$X[k] = \sum_{n=0}^{N-1} x[n] \cdot e^{-i2\pi kn/N}$$
+            <p>Where: \(x[n]\) is the input sequence (price data), \(X[k]\) is the output (frequency components), \(N\) is the number of data points, and \(k\) is the index for each frequency.</p>
+        </div>
+        <p>We use the Fast Fourier Transform (FFT) because it's a much quicker way to do the calculations.</p>
+        
+        <h4>Application to Financial Time Series</h4>
+        <p>When we use the Fourier Transform on price data, it shows us the main cycles happening in the market. These can be short patterns within a day or longer ones that last for weeks or months. By finding these cycles, we can try to predict where the price might go if the patterns continue. Our process is:</p>
+        <ol>
+            <li><strong>Detrending</strong>: Remove the main trend from the price to focus on the cycles.</li>
+            <li><strong>FFT Application</strong>: Apply the FFT to the price data to get the frequency information.</li>
+            <li><strong>Dominant Frequency Identification</strong>: Find the most important frequencies (the ones with the biggest impact).</li>
+            <li><strong>Signal Reconstruction</strong>: Rebuild the price signal using only those important frequencies to filter out noise.</li>
+            <li><strong>Forecasting</strong>: Extend the reconstructed signal into the future to predict price movements.</li>
+        </ol>
+        
+        <h3>GARCH Volatility Modeling</h3>
+        <h4>Theoretical Background</h4>
+        <p>The GARCH model is a popular tool for financial data. It's good at handling two common things we see with market volatility:</p>
+        <ol>
+            <li><strong>Volatility Clustering</strong>: High volatility periods are often followed by more high volatility, and the same for low volatility.</li>
+            <li><strong>Mean Reversion</strong>: Volatility tends to return to a long-term average.</li>
+        </ol>
+        <div class="equation">
+            <p>The GARCH(p,q) model is defined as:</p>
+            $$\sigma_t^2 = \omega + \sum_{i=1}^{p} \alpha_i \epsilon_{t-i}^2 + \sum_{j=1}^{q} \beta_j \sigma_{t-j}^2$$
+            <p>Where: \(\sigma_t^2\) is the volatility at time \(t\), \(\epsilon_t\) is the return, and \(\omega\), \(\alpha_i\), and \(\beta_j\) are parameters the model estimates.</p>
+        </div>
+        <p>In our strategy, we use a simple GARCH(1,1) model. It's usually good enough to get a handle on how volatility behaves for stock returns.</p>
+        
+        <h4>Application to Financial Time Series</h4>
+        <p>The GARCH model helps our trading strategy in a few ways:</p>
+        <ol>
+            <li><strong>Volatility Forecasting</strong>: By estimating the model's parameters, we can forecast future volatility, which is key for managing risk and sizing positions.</li>
+            <li><strong>Risk Assessment</strong>: Higher forecasted volatility suggests more uncertainty and risk, which might mean using smaller position sizes or wider stop-losses.</li>
+            <li><strong>Regime Identification</strong>: Big changes in volatility can signal a shift in the market, which might require us to adjust the strategy.</li>
+        </ol>
+        
+        <h3>Confidence Scoring System</h3>
+        <h4>Methodology</h4>
+        <p>The confidence score is the heart of our strategy. It combines the signals from the Fourier analysis and the GARCH model to create a single score for how good a trade looks. This score is between 0 and 100, where a higher score means we're more confident in the trade.</p>
+        <div class="equation">
+            <p>The confidence score is a weighted mix of a few factors:</p>
+            $$\text{Confidence Score} = w_{\text{FFT}} \cdot \text{FFT Confidence} + w_{\text{GARCH}} \cdot \text{Volatility Confidence}$$
+            <p>Where the weights for the FFT and GARCH signals are typically 0.6 and 0.4, respectively. The confidence values are derived from the clarity of the Fourier signal and the stability of the volatility.</p>
+        </div>
+        
+        <h4>Trade Execution Threshold</h4>
+        <p>The strategy will only make a trade if the confidence score is above a set number (we use 70). This acts as a filter, so we only trade when everything looks right. This should hopefully lead to better results for the amount of risk we take.</p>
+        <div class="equation">
+            <p>Additionally, the position size is adjusted based on how high the confidence score is:</p>
+            $$\text{Position Size} = \text{Base Size} \cdot (0.5 + 0.5 \cdot \frac{\text{Confidence} - \text{Threshold}}{100 - \text{Threshold}})$$
+        </div>
+        <p>This approach also lets us put more money into trades we feel more confident about, while still using a smaller size for trades that just barely meet the cut.</p>
+        
+        <h2>Implementation Details</h2>
+        <h3>QuantConnect Framework Integration</h3>
+        <p>We built this strategy on QuantConnect, an online platform for building and testing trading algorithms. It's useful for a few reasons:</p>
+        <ul>
+            <li><strong>Data Access</strong>: It has good historical data for many assets.</li>
+            <li><strong>Python Integration</strong>: It works with Python, so we can use libraries like NumPy, SciPy, and ARCH.</li>
+            <li><strong>Backtesting Engine</strong>: It has a solid backtesting engine to simulate trading.</li>
+            <li><strong>Live Trading Capabilities</strong>: You can switch from testing to live trading easily.</li>
+        </ul>
+        <p>We built our code to follow the standard QuantConnect structure, using the main functions like <code>Initialize()</code> and <code>OnData()</code>.</p>
+        
+        <h3>Custom Indicators</h3>
+        <p>To make the strategy work, we had to build a few custom indicators in QuantConnect:</p>
+        <h4>FFT Indicator</h4>
+        <pre>
+class FourierTransformIndicator:
+    def __init__(self, window_size=1024, num_components=10, forecast_periods=5):
+        # ... (implementation details)
+    def update(self, price):
+        # ... (implementation details)
+</pre>
+        <h4>GARCH Indicator</h4>
+        <pre>
+class GARCHModelIndicator:
+    def __init__(self, window_size=2000, p=1, q=1, forecast_horizon=5):
+        # ... (implementation details)
+    def update(self, price):
+        # ... (implementation details)
+</pre>
+        <h4>Confidence Scorer</h4>
+        <pre>
+class ConfidenceScorer:
+    def __init__(self, fft_weight=0.6, garch_weight=0.4, threshold=70):
+        # ... (implementation details)
+    def calculate_confidence(self, fft_indicator, garch_indicator):
+        # ... (implementation details)
+</pre>
+        
+        <h3>Risk Management</h3>
+        <h4>Position Sizing</h4>
+        <p>How much we invest in a trade is a key part of the strategy and is tied directly to the confidence score. We start with a base position size, like 1% of the portfolio, and adjust it based on how high the score is.</p>
+        <h4>Stop Loss and Take Profit</h4>
+        <p>The strategy also uses the volatility forecast from the GARCH model to set its stop-loss and take-profit levels automatically.</p>
+        
+        <h2>Backtesting Results</h2>
+        <h3>Testing Environment</h3>
+        <p>We tested the strategy using historical data to see how it would have performed in real market conditions. The tests were run on QuantConnect's backtesting platform.</p>
+        <h4>Data and Time Period</h4>
+        <p>We tested the strategy on SPY, the big S&P 500 ETF, because it's very liquid and gives a good sense of the overall US market. The test ran on data from all of 2023, which included a mix of different market types.</p>
+        <h4>Parameter Settings</h4>
+        <table>
+            <thead>
+                <tr><th>Parameter</th><th>Value</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>FFT Window Size</td><td>1024</td><td>Data points for FFT analysis</td></tr>
+                <tr><td>FFT Components</td><td>10</td><td>Number of dominant frequencies to use</td></tr>
+                <tr><td>GARCH Window Size</td><td>2000</td><td>Data points for GARCH model</td></tr>
+                <tr><td>Confidence Threshold</td><td>70</td><td>Minimum score for a trade</td></tr>
+                <tr><td>FFT Weight</td><td>0.6</td><td>Weight of FFT signal in confidence score</td></tr>
+                <tr><td>GARCH Weight</td><td>0.4</td><td>Weight of volatility in confidence score</td></tr>
+                <tr><td>Stop Loss Multiplier</td><td>2.0</td><td>Multiplier for volatility-based stop loss</td></tr>
+                <tr><td>Take Profit Multiplier</td><td>3.0</td><td>Multiplier for volatility-based take profit</td></tr>
+                <tr><td>Position Sizing Factor</td><td>0.01</td><td>Base position size as a percent of portfolio</td></tr>
+            </tbody>
+        </table>
+        
+        <h3>Expected Performance Characteristics</h3>
+        <p>Given how the strategy is designed, here's what we'd expect to see from its performance:</p>
+        <ol>
+            <li><strong>Selective Trading</strong>: It should be picky about its trades, which hopefully means fewer trades but a higher win rate.</li>
+            <li><strong>Adaptive Risk Management</strong>: Its risk management should adapt to the market, using wider stops in volatile times and tighter ones when it's calm.</li>
+            <li><strong>Regime Awareness</strong>: It should be able to tell what kind of market it's in (trending or sideways) and perform reasonably well in both.</li>
+            <li><strong>Balanced Risk-Reward</strong>: It aims for a good risk-reward ratio on each trade, which should help it stay profitable.</li>
+        </ol>
+        
+        <h3>Limitations and Future Improvements</h3>
+        <h4>Known Limitations</h4>
+        <ul>
+            <li><strong>Computational Intensity</strong>: The calculations can be slow, which makes it hard to run on many securities at once.</li>
+            <li><strong>Data Requirements</strong>: The strategy needs a lot of historical data to get started, which can be a problem for new stocks.</li>
+            <li><strong>Parameter Sensitivity</strong>: The results can be sensitive to the settings, so they need to be chosen carefully.</li>
+        </ul>
+        <h4>Potential Improvements</h4>
+        <ul>
+            <li><strong>Multi-Timeframe Analysis</strong>: Looking at multiple timeframes at once could give a better signal.</li>
+            <li><strong>Adaptive Parameters</strong>: The parameters could be made to adjust automatically to market conditions.</li>
+            <li><strong>Machine Learning Integration</strong>: Machine learning could be used to fine-tune the confidence score or other parameters.</li>
+        </ul>
+        
+        <h2>Conclusion</h2>
+        <p>In this paper, we've walked through a trading algorithm that combines Fourier analysis, GARCH volatility models, and a confidence score. It works on one-minute data and uses a special filter to only trade when its confidence is high.</p>
+        <p>The main parts of the strategy are:</p>
+        <ol>
+            <li><strong>Fourier Transform Analysis</strong>: To find cyclical patterns in price data.</li>
+            <li><strong>GARCH Volatility Modeling</strong>: To forecast volatility and manage risk.</li>
+            <li><strong>Confidence Scoring System</strong>: To combine the signals and measure trade quality.</li>
+            <li><strong>Risk Management Framework</strong>: To control position size and set stop-losses.</li>
+        </ol>
+        <p>We built the strategy in Python on the QuantConnect platform, which gave us the data, testing tools, and ability to trade live. We created custom indicators for each part of the system and brought them all together in the main algorithm.</p>
+        <p>The new idea here isn't the individual tools themselves, which are well-known, but how they're combined into a confidence score. This allows the strategy to look at trades in a more detailed way, instead of just getting a simple 'buy' or 'sell' signal.</p>
+        <p>As markets change, strategies that can adapt while still being smart about risk will be more important. The system we've described here is one example of how to build such a strategy, mixing solid math with real-world trading rules.</p>
+        <p>To be successful in algorithmic trading, it's not enough to just find patterns or predict volatility. The real challenge is putting those ideas together into a complete trading plan that balances risk and reward. This strategy, with its Fourier, GARCH, and confidence score components, is one attempt at solving that challenge and creating a structured way to trade the markets.</p>
     </div>
-    
-    <div class="footer">
-        <p>&copy; 2025 | Trading with Confidence: A Fourier Transform and GARCH Model Strategy</p>
-    </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
 </body>
 </html>

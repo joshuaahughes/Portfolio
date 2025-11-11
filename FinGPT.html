@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Analysis of a Tiny Recursive Model for Financial Time-Series Forecasting</title>
+    <style>
+        body {
+            font-family: "Times New Roman", Times, serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: justify;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #222;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        h2 {
+            font-size: 20px;
+        }
+        h3 {
+            font-size: 16px;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        .container {
+            margin-top: 2em;
+        }
+        .image-container {
+            text-align: center;
+            margin: 2em 0;
+        }
+        img {
+            max-width: 80%;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+        }
+        .caption {
+            text-align: center;
+            font-style: italic;
+            margin-top: 0.5em;
+        }
+        .references {
+            margin-top: 2em;
+        }
+        .references h2 {
+            text-align: left;
+        }
+        .references ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .references li {
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>An Analysis of a Tiny Recursive Model for Financial Time-Series Forecasting</h1>
+    <h2 style="text-align:center;">Author: Joshua Hughes</h2>
+    <h3 style="text-align:center;">November 2025</h3>
+
+    <div class="container">
+        <h2>Abstract</h2>
+        <p>
+            This paper presents an analysis of a Tiny Recursive Model (TRM) for the prediction of financial time-series data. The model was trained on candlestick data to forecast future price movements. Our findings indicate that the model's predictive accuracy is highly dependent on the time of day. While the model exhibits a tendency to predict a flatline during midday trading hours, it demonstrates significant accuracy during the open and close of the market. This suggests that the model is adept at capturing the distinct patterns present during these periods of high market activity.
+        </p>
+
+        <h2>1. Introduction</h2>
+        <p>
+            The application of deep learning models to financial market prediction has been a subject of considerable interest. This project began with the goal of applying a standard Generative Pre-trained Transformer (GPT) architecture to financial data. However, to better capture the temporal dynamics of the market and improve results, the model evolved. In this study, we investigate the performance of the resulting hybrid model, which incorporates the recursive mechanisms of a Tiny Recursive Model (TRM) for forecasting short-term price movements.
+        </p>
+
+        <h2>2. Methodology</h2>
+        <p>
+            The core of our methodology is the implementation of a Tiny Recursive Model (TRM), as described in the work by [Jolicoeur-Martineau, 2025]. The project initially utilized a pure GPT-like autoregressive model, but to enhance predictive performance, this was augmented with the latent recursion mechanism of the TRM. The resulting model is autoregressive, predicting future values one step at a time, where the prediction for each minute is recursively fed back into the model to generate the prediction for the next minute. This is achieved through a latent recursion mechanism, where a hidden state is updated at each step along with the actual prediction. The model was trained on a dataset of financial candlestick data, with the goal of predicting the subsequent 30 candles, and was optimized to minimize loss.
+        </p>
+
+        <h2>3. Results</h2>
+        <p>
+            The performance of the TRM was evaluated by comparing its predictions to the ground truth. A qualitative analysis of the model's output reveals two distinct modes of behavior. For the majority of the trading day, the model's predictions are conservative, often forecasting a flatline. This is a common outcome when a model is optimized for loss minimization in a volatile environment. Figure 1 illustrates this behavior.
+        </p>
+        <div class="image-container">
+            <img src="/Portfolio/assets/inference_visualization.png" alt="Inference Visualization - Mid-day">
+            <p class="caption">Figure 1: Model inference during midday trading, showing a tendency towards flatline prediction.</p>
+        </div>
+        <p>
+            In contrast, the model demonstrates a marked increase in accuracy during the opening and closing periods of the market. During these times, the model's predictions align closely with the actual price movements. Figure 2 shows an example of the model's high accuracy at the market open.
+        </p>
+        <div class="image-container">
+            <img src="/Portfolio/assets/inference_visualization-goodprediction-open.png" alt="Inference Visualization - Good Prediction at Open">
+            <p class="caption">Figure 2: Model inference at market open, demonstrating high predictive accuracy.</p>
+        </div>
+
+        <h2>4. Discussion</h2>
+        <p>
+            The observed dichotomy in the model's performance suggests that the TRM is particularly sensitive to the distinct patterns that emerge during the market open and close. These periods are characterized by increased trading volume and the dissemination of market-moving news, which may result in more discernible patterns for the model to learn. The model's conservative predictions during midday may be a result of the less structured, more stochastic nature of price movements during these hours.
+        </p>
+
+        <h2>5. Conclusion</h2>
+        <p>
+            In this paper, we have presented an analysis of a Tiny Recursive Model for financial forecasting. Our findings indicate that while the model's overall performance is modest, it exhibits periods of high accuracy during market open and close. This suggests that the model is capable of identifying and exploiting predictable patterns in financial time-series data, particularly during times of high market activity. Future research may explore modifications to the loss function or the inclusion of additional data features to encourage more aggressive predictions during midday trading.
+        </p>
+
+        <div class="references">
+            <h2>References</h2>
+            <ul>
+                <li>[1] Jolicoeur-Martineau, A. (2025). Less is More: Recursive Reasoning with Tiny Networks. *ArXiv*, abs/2510.04871. <a href="https://arxiv.org/abs/2510.04871">https://arxiv.org/abs/2510.04871</a></li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+</html>

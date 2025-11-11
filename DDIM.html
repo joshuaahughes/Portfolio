@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DDIM for Financial Prediction</title>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <style>
+        
+        body {
+            font-family: "Times New Roman", Times, serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: justify;
+        }
+        h1, h2, h3 {
+            text-align: center;
+            color: #222;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        h2 {
+            font-size: 20px;
+        }
+        h3 {
+            font-size: 16px;
+        }
+        p {
+            margin-bottom: 1em;
+        }
+        .container {
+            margin-top: 2em;
+        }
+        .image-container {
+            text-align: center;
+            margin: 2em 0;
+        }
+        img {
+            max-width: 80%;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+        }
+        .caption {
+            text-align: center;
+            font-style: italic;
+            margin-top: 0.5em;
+        }
+        .references {
+            margin-top: 2em;
+        }
+        .references h2 {
+            text-align: left;
+        }
+        .references ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .references li {
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DDIM for Financial Prediction</h1>
+        <h2 style="text-align:center;">Author: Joshua Hughes</h2>
+        <h2>1. Introduction</h2>
+        <p>
+            This project implements a conditional Denoising Diffusion Implicit Model (DDIM) for the complex task of financial time series forecasting. Traditional forecasting models often struggle to capture the stochastic and non-linear nature of financial markets. This project moves beyond standard approaches by leveraging a generative model that can produce a distribution of plausible future price sequences, conditioned on specific contextual information.
+        </p>
+        <p>
+            The core innovation lies in its conditional architecture. The model's predictions are not generated in a vacuum; they are guided by:
+            <ul>
+                <li><b>Historical Price Action:</b> A lookback window of recent market activity.</li>
+                <li><b>Ticker Identity:</b> A learned embedding for each stock, allowing the model to understand the unique volatility and behavior of individual assets.</li>
+                <li><b>Cyclical Time Features:</b> Sine and cosine transformations of the time of day and day of the week, enabling the model to learn intraday and intraweek patterns.</li>
+            </ul>
+            To handle the massive datasets typical in finance, the project employs an efficient HDF5-based data pipeline, ensuring scalability and low memory overhead during training.
+        </p>
+
+        <h2>2. Methodology: The DDIM Framework</h2>
+        <p>
+            The DDIM is a type of generative model that learns to create data by reversing a gradual noising process. This is broken into two key phases.
+        </p>
+        <h3>2.1. The Forward Process (Noising)</h3>
+        <p>
+            In the forward process, we take a clean data sample (a future sequence of prices) and systematically add Gaussian noise over a series of discrete time steps. By the end of this process, the original structured data is transformed into pure, random noise. The <code>ForwardProcess</code> class manages this, pre-calculating a noise schedule (<code>betas</code>, <code>alphas</code>) to control the noise level at each step. The model learns the underlying data distribution by being trained to reverse this very process.
+        </p>
+        <h3>2.2. The Reverse Process (Denoising for Prediction)</h3>
+        <p>
+            The reverse process is where prediction occurs. We start with random noise and iteratively denoise it to generate a clean, structured data sample. The DDIM is "implicit" and deterministic, meaning it follows a direct path from noise to a clean signal, making it much faster than traditional Denoising Diffusion Probabilistic Models (DDPMs).
+        </p>
+        <p>
+            The <code>ddim_reverse_step</code> function orchestrates this. At each step, the trained model predicts the noise present in the current sample, given the context (historical data, ticker ID). The DDIM formula then uses this noise prediction to calculate the slightly-less-noisy sample for the previous step, progressively refining the output until a clean prediction is formed.
+        </p>
+
+        <h2>3. Model Architecture</h2>
+        <h3>3.1. The Transformer Denoising Engine</h3>
+        <p>
+            The heart of the denoising process is a Transformer-based model (<code>TransformerModel</code>). Its sole purpose is not to predict the future directly, but to predict the noise that was added to a corrupted future sample.
+        </p>
+        <p>
+            The model takes as input:
+            <ul>
+                <li>A <b>noisy target sequence</b>.</li>
+                <li>The current <b>time step</b> <code>t</code> of the diffusion process.</li>
+                <li>The <b>context sequence</b> (historical data).</li>
+                <li>The <b>ticker ID</b> and a <b>temporal ID</b> for conditioning.</li>
+            </ul>
+            Embeddings for the ticker and time are concatenated with the input data. The Transformer's attention mechanism is uniquely suited to identify complex relationships between the historical context and the noisy future, allowing it to make a highly accurate noise prediction, which is the key to successful generation.
+        </p>
+        <h3>3.2. Data Representation: The "Ticker Snapshot"</h3>
+        <p>
+            The model operates on a simplified, multi-feature representation of the market at each time step. The input features include:
+            <ul>
+                <li><b>OHLC Prices:</b> Open, High, Low, and Close.</li>
+                <li><b>Log-Volume Difference:</b> To capture changes in trading activity.</li>
+                <li><b>Cyclical Time Features:</b> Four features representing the time of day and day of week.</li>
+            </ul>
+            This 9-dimensional vector serves as the fundamental unit of data for both context and prediction.
+        </p>
+
+        <h2>4. Data and Training Pipeline</h2>
+        <h3>4.1. Efficient HDF5 Data Handling</h3>
+        <p>
+            To manage potentially terabytes of financial data, the project uses a pre-processing step (<code>prepare_dataset.py</code>) to convert raw CSV files into a single, compressed HDF5 file. The <code>HDF5Dataset</code> class then allows the PyTorch <code>DataLoader</code> to read batches directly from disk, keeping memory usage minimal and enabling fast, parallel data loading.
+        </p>
+        <h3>4.2. Training and Prediction</h3>
+        <p>
+            The training script (<code>train.py</code>) orchestrates the learning process. In each step, it takes a batch of data, adds a random amount of noise to the target sequence, and tasks the Transformer model with predicting that noise. The loss is calculated as the Mean Squared Error between the true noise and the predicted noise, with an additional smoothness penalty to encourage more realistic price trajectories.
+        </p>
+        <p>
+            The prediction script (<code>predict.py</code>) uses the trained model to generate new price sequences. It takes a historical context, feeds it to the reverse diffusion process, and generates multiple sample predictions to form a probabilistic forecast.
+        </p>
+
+        <h2>5. Evaluation and Findings</h2>
+        <p>
+            The model's performance is assessed in <code>evaluate_model.py</code> using metrics suited for probabilistic forecasts:
+            <ul>
+                <li><b>Continuous Ranked Probability Score (CRPS):</b> A metric that compares the entire predictive distribution to the ground truth observation, rewarding both accuracy and sharpness of the forecast.</li>
+                <li><b>Mean Absolute Error (MAE):</b> Calculated on the median of the prediction samples to gauge the accuracy of the central forecast.</li>
+            </ul>
+            Evaluation is performed using a sliding window approach over a held-out dataset to simulate real-world forecasting scenarios. The results, visible in the project's `results/` directory, demonstrate the model's ability to generate realistic and varied price scenarios.
+        </p>
+        
+        <h3>5.1. Example Prediction Analysis</h3>
+        <img src="/Portfolio/assets/2025_08_26_2111_results.png" alt="DDIM Prediction Example">
+        <p class="caption">
+            Figure 1: Sample prediction for the SPY ticker. The model takes the last 30 minutes of price data (blue line) as context and generates a distribution of 100 possible future price paths (light gray lines) for the next 30 minutes.
+        </p>
+        <p>
+            Key observations from this example include:
+            <ul>
+                <li><b>Probabilistic Range:</b> The model does not predict a single price but a wide range of possibilities, capturing market uncertainty. The individual predictions show significant volatility, reflecting real-world price action.</li>
+                <li><b>Median Forecast:</b> The red dashed line represents the median of all predictions, offering a more stable, central forecast. In this case, it suggests a slight upward trend followed by consolidation.</li>
+                <li><b>Predicted Extrema:</b> The model provides a distribution for the maximum high and minimum low prices over the prediction window. For this forecast, the median of the potential highs is around $469.72, while the median of the potential lows is $459.05, defining a likely trading range.
+                </li>
+            </ul>
+            This ability to generate a full distribution of outcomes is a key advantage of the DDIM approach, allowing for more sophisticated risk management and strategy development.
+        </p>
+
+        <h2>6. Conclusion</h2>
+        <p>
+            This project successfully demonstrates the application of a conditional Denoising Diffusion Implicit Model to the challenging domain of financial forecasting. By combining a powerful Transformer architecture with a principled, generative framework, the model captures the complex dynamics of financial time series.
+        </p>
+        <p>
+            The key strengths of this approach are its probabilistic nature, providing a distribution of outcomes rather than a single point forecast, and its conditional design, which allows for more nuanced and asset-specific predictions. The use of an efficient HDF5 data pipeline makes the system scalable and robust for large-scale financial modeling.
+        </p>
+    </div>
+</body>
+</html>
