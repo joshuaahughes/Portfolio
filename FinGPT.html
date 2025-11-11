@@ -89,14 +89,14 @@
             The performance of the TRM was evaluated by comparing its predictions to the ground truth. A qualitative analysis of the model's output reveals two distinct modes of behavior. For the majority of the trading day, the model's predictions are conservative, often forecasting a flatline. This is a common outcome when a model is optimized for loss minimization in a volatile environment. Figure 1 illustrates this behavior.
         </p>
         <div class="image-container">
-            <img src="/Portfolio/assets/inference_visualization.png" alt="Inference Visualization - Mid-day">
+            <img src="/assets/inference_visualization.png" alt="Inference Visualization - Mid-day">
             <p class="caption">Figure 1: Model inference during midday trading, showing a tendency towards flatline prediction.</p>
         </div>
         <p>
             In contrast, the model demonstrates a marked increase in accuracy during the opening and closing periods of the market. During these times, the model's predictions align closely with the actual price movements. Figure 2 shows an example of the model's high accuracy at the market open.
         </p>
         <div class="image-container">
-            <img src="/Portfolio/assets/inference_visualization-goodprediction-open.png" alt="Inference Visualization - Good Prediction at Open">
+            <img src="/assets/inference_visualization-goodprediction-open.png" alt="Inference Visualization - Good Prediction at Open">
             <p class="caption">Figure 2: Model inference at market open, demonstrating high predictive accuracy.</p>
         </div>
 
