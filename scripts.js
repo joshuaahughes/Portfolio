@@ -1,31 +1,4 @@
-// Custom cursor
-const cursor = document.querySelector('.cursor');
-
-document.addEventListener('mousemove', (e) => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-});
-
-document.addEventListener('mousedown', () => {
-    cursor.style.transform = 'translate(-50%, -50%) scale(0.8)';
-});
-
-document.addEventListener('mouseup', () => {
-    cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-});
-
-// Interactive elements with cursor
-const links = document.querySelectorAll('a, button, .filter-btn, .portfolio-item');
-
-links.forEach(link => {
-    link.addEventListener('mouseenter', () => {
-        cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
-    });
-    
-    link.addEventListener('mouseleave', () => {
-        cursor.style.transform = 'translate(-50%, -50%) scale(1)';
-    });
-});
+// Custom cursor removed
 
 // Sticky Header
 const header = document.querySelector('header');
